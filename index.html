@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SaRa Sols — Software Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E1A;
+    --panel:#12162A;
+    --panel-2:#171C33;
+    --line:#262C49;
+    --cream:#F4F2EC;
+    --muted:#8C90AB;
+    --coral:#FF6B4A;
+    --mint:#5EEAD4;
+    --amber:#FFC857;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--cream);
+    font-family:'Inter',sans-serif;
+    overflow-x:hidden;
+  }
+  h1,h2,h3,.display{font-family:'Sora',sans-serif;}
+  .mono{font-family:'JetBrains Mono',monospace;}
+  a{text-decoration:none;color:inherit;}
+
+  /* background grid texture */
+  .grid-bg{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size:56px 56px;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 40%, transparent 90%);
+  }
+
+  /* NAV */
+  nav{
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    display:flex; justify-content:space-between; align-items:center;
+    padding:22px 56px;
+    backdrop-filter:blur(10px);
+    background:rgba(11,14,26,0.65);
+    border-bottom:1px solid var(--line);
+  }
+  .logo{
+    font-weight:800; font-size:20px; letter-spacing:0.5px; display:flex; align-items:center; gap:10px;
+  }
+  .logo .dot{
+    width:9px;height:9px;border-radius:50%;background:var(--coral);
+    box-shadow:0 0 12px var(--coral);
+    animation:pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes pulse{
+    0%,100%{ transform:scale(1); opacity:1;}
+    50%{ transform:scale(1.5); opacity:0.6;}
+  }
+  .nav-links{display:flex; gap:36px; font-size:14px; color:var(--muted);}
+  .nav-links a{transition:color .25s;}
+  .nav-links a:hover{color:var(--cream);}
+  .nav-cta{
+    font-size:13px; font-weight:600; padding:10px 20px; border:1px solid var(--coral);
+    border-radius:30px; color:var(--coral); transition:all .25s;
+  }
+  .nav-cta:hover{background:var(--coral); color:var(--bg);}
+
+  /* HERO */
+  .hero{
+    position:relative; z-index:1;
+    min-height:100vh;
+    display:flex; flex-direction:column; justify-content:center;
+    padding:140px 56px 80px;
+    max-width:1280px; margin:0 auto;
+  }
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--mint);
+    border:1px solid rgba(94,234,212,0.3); background:rgba(94,234,212,0.06);
+    padding:7px 14px; border-radius:30px; width:fit-content;
+    opacity:0; animation:fadeUp .8s ease forwards .1s;
+  }
+  .hero h1{
+    font-size:clamp(42px,6.2vw,84px);
+    line-height:1.04;
+    font-weight:800;
+    margin:26px 0 24px;
+    max-width:920px;
+    letter-spacing:-1.5px;
+    opacity:0; animation:fadeUp .9s ease forwards .25s;
+  }
+  .hero h1 .accent{color:var(--coral); position:relative;}
+  .hero h1 .accent2{color:var(--mint);}
+  .hero p.sub{
+    font-size:18px; color:var(--muted); max-width:560px; line-height:1.65;
+    opacity:0; animation:fadeUp .9s ease forwards .4s;
+  }
+  .hero-actions{
+    display:flex; gap:16px; margin-top:38px;
+    opacity:0; animation:fadeUp .9s ease forwards .55s;
+  }
+  .btn-primary{
+    background:var(--coral); color:#0B0E1A; font-weight:700; font-size:14.5px;
+    padding:15px 30px; border-radius:10px; transition:transform .25s, box-shadow .25s;
+    box-shadow:0 0 0 0 rgba(255,107,74,0.5);
+  }
+  .btn-primary:hover{transform:translateY(-3px); box-shadow:0 10px 30px -8px rgba(255,107,74,0.6);}
+  .btn-ghost{
+    border:1px solid var(--line); color:var(--cream); font-weight:600; font-size:14.5px;
+    padding:15px 30px; border-radius:10px; transition:all .25s;
+  }
+  .btn-ghost:hover{border-color:var(--mint); color:var(--mint);}
+
+  @keyframes fadeUp{
+    from{opacity:0; transform:translateY(22px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+
+  /* trace line svg decoration */
+  .hero-trace{
+    position:absolute; right:0; top:0; height:100%; width:46%;
+    z-index:0; opacity:0.9; pointer-events:none;
+  }
+
+  /* stats row */
+  .stats{
+    display:flex; gap:64px; margin-top:64px; flex-wrap:wrap;
+    opacity:0; animation:fadeUp .9s ease forwards .7s;
+  }
+  .stat-num{font-size:30px; font-weight:800; font-family:'Sora',sans-serif;}
+  .stat-label{font-size:12.5px; color:var(--muted); margin-top:4px; font-family:'JetBrains Mono',monospace;}
+
+  /* SECTION SHARED */
+  section{position:relative; z-index:1; padding:120px 56px; max-width:1280px; margin:0 auto;}
+  .section-head{max-width:640px; margin-bottom:64px;}
+  .section-tag{
+    font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--amber);
+    text-transform:uppercase; letter-spacing:2px; margin-bottom:14px; display:block;
+  }
+  .section-head h2{font-size:clamp(30px,4vw,46px); font-weight:800; letter-spacing:-1px; line-height:1.1;}
+  .section-head p{color:var(--muted); margin-top:18px; font-size:16.5px; line-height:1.7;}
+
+  /* SERVICES - circuit path layout */
+  .services-wrap{position:relative;}
+  .services-track{
+    position:absolute; top:0; left:0; width:100%; height:100%;
+    z-index:0; pointer-events:none;
+  }
+  .services-grid{
+    position:relative; z-index:1;
+    display:grid; grid-template-columns:repeat(4,1fr); gap:2px;
+    background:var(--line);
+    border:1px solid var(--line);
+    border-radius:18px; overflow:hidden;
+  }
+  .service-card{
+    background:var(--panel);
+    padding:38px 28px;
+    transition:background .35s;
+    position:relative;
+    min-height:280px;
+    display:flex; flex-direction:column; justify-content:space-between;
+  }
+  .service-card:hover{background:var(--panel-2);}
+  .service-card::before{
+    content:'';
+    position:absolute; left:0; top:0; height:0; width:3px;
+    background:var(--coral);
+    transition:height .4s ease;
+  }
+  .service-card:hover::before{height:100%;}
+  .service-index{
+    font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--muted);
+  }
+  .service-icon{
+    width:44px;height:44px; margin:22px 0 18px;
+    display:flex; align-items:center; justify-content:center;
+    border-radius:10px; background:rgba(255,107,74,0.08); border:1px solid rgba(255,107,74,0.2);
+  }
+  .service-card h3{font-size:19px; font-weight:700; margin-bottom:10px;}
+  .service-card p{font-size:14px; color:var(--muted); line-height:1.6;}
+  .service-card .tags{margin-top:18px; display:flex; flex-wrap:wrap; gap:6px;}
+  .service-card .tags span{
+    font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--mint);
+    border:1px solid rgba(94,234,212,0.25); padding:3px 8px; border-radius:20px;
+  }
+
+  @media(max-width:1000px){
+    .services-grid{grid-template-columns:repeat(2,1fr);}
+  }
+  @media(max-width:640px){
+    .services-grid{grid-template-columns:1fr;}
+  }
+
+  /* PROCESS */
+  .process-list{display:flex; flex-direction:column;}
+  .process-row{
+    display:grid; grid-template-columns:80px 1fr 1fr; gap:30px;
+    padding:32px 0; border-top:1px solid var(--line);
+    align-items:start;
+  }
+  .process-row:last-child{border-bottom:1px solid var(--line);}
+  .process-num{font-family:'JetBrains Mono',monospace; color:var(--coral); font-size:14px; padding-top:4px;}
+  .process-row h3{font-size:21px; font-weight:700;}
+  .process-row p{color:var(--muted); font-size:15px; line-height:1.7; padding-top:4px;}
+
+  /* WHY / FEATURES */
+  .why-grid{display:grid; grid-template-columns:1.1fr 1fr; gap:60px; align-items:center;}
+  .why-visual{
+    background:var(--panel); border:1px solid var(--line); border-radius:18px;
+    height:420px; position:relative; overflow:hidden;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .why-list{display:flex; flex-direction:column; gap:26px;}
+  .why-item{display:flex; gap:18px;}
+  .why-item .num{
+    font-family:'JetBrains Mono',monospace; color:var(--mint); font-size:13px;
+    border:1px solid rgba(94,234,212,0.25); width:34px; height:34px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center; border-radius:8px;
+  }
+  .why-item h4{font-size:17px; font-weight:700; margin-bottom:6px;}
+  .why-item p{font-size:14.5px; color:var(--muted); line-height:1.6;}
+
+  @media(max-width:900px){
+    .why-grid{grid-template-columns:1fr;}
+    .why-visual{height:280px;}
+  }
+
+  /* CTA */
+  .cta-section{
+    background:linear-gradient(135deg, var(--panel) 0%, var(--panel-2) 100%);
+    border:1px solid var(--line);
+    border-radius:24px;
+    padding:80px 56px;
+    text-align:center;
+    position:relative; overflow:hidden;
+  }
+  .cta-section h2{font-size:clamp(28px,4vw,44px); font-weight:800; letter-spacing:-1px; max-width:680px; margin:0 auto 18px;}
+  .cta-section p{color:var(--muted); margin-bottom:34px; font-size:16px;}
+  .cta-glow{
+    position:absolute; width:500px; height:500px; border-radius:50%;
+    background:radial-gradient(circle, rgba(255,107,74,0.18) 0%, transparent 70%);
+    top:-200px; left:50%; transform:translateX(-50%);
+    animation:glow 5s ease-in-out infinite;
+  }
+  @keyframes glow{
+    0%,100%{opacity:0.6;}
+    50%{opacity:1;}
+  }
+
+  footer{
+    position:relative; z-index:1; padding:50px 56px; border-top:1px solid var(--line);
+    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:20px;
+    color:var(--muted); font-size:13.5px;
+  }
+  footer .f-links{display:flex; gap:28px;}
+  footer a:hover{color:var(--cream);}
+
+  /* reveal-on-scroll */
+  .reveal{opacity:0; transform:translateY(28px); transition:opacity .8s ease, transform .8s ease;}
+  .reveal.in{opacity:1; transform:translateY(0);}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important; transition:none !important;}
+  }
+
+  @media(max-width:640px){
+    nav{padding:18px 22px;}
+    .nav-links{display:none;}
+    section{padding:80px 22px;}
+    .hero{padding:120px 22px 60px;}
+    .stats{gap:36px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+
+<nav>
+  <div class="logo"><span class="dot"></span>SaRa&nbsp;Sols</div>
+  <div class="nav-links">
+    <a href="#services">Services</a>
+    <a href="#process">Process</a>
+    <a href="#why">Why us</a>
+    <a href="#contact">Contact</a>
+  </div>
+  <a href="#contact" class="nav-cta">Start a project</a>
+</nav>
+
+<section class="hero">
+  <svg class="hero-trace" viewBox="0 0 600 800" preserveAspectRatio="none">
+    <path id="tracePath" d="M600,40 L420,40 L420,160 L520,160 L520,300 L380,300 L380,440 L500,440 L500,580 L400,580 L400,720 L560,720"
+      fill="none" stroke="#262C49" stroke-width="2"/>
+    <path d="M600,40 L420,40 L420,160 L520,160 L520,300 L380,300 L380,440 L500,440 L500,580 L400,580 L400,720 L560,720"
+      fill="none" stroke="#FF6B4A" stroke-width="2" stroke-dasharray="14 2000" id="traceAnim"/>
+    <circle cx="420" cy="160" r="4" fill="#5EEAD4"/>
+    <circle cx="380" cy="440" r="4" fill="#FFC857"/>
+    <circle cx="400" cy="720" r="4" fill="#FF6B4A"/>
+  </svg>
+
+  <span class="eyebrow">● Available for new builds — Q3 2026</span>
+  <h1>We engineer <span class="accent">software</span> that ships,<br>scales, and stays <span class="accent2">solid</span>.</h1>
+  <p class="sub">SaRa Sols is a software studio building web platforms, mobile apps, and full product lines for founders and engineering teams who need a partner that codes like it's their own company.</p>
+  <div class="hero-actions">
+    <a href="#contact" class="btn-primary">Start a project →</a>
+    <a href="#services" class="btn-ghost">See what we build</a>
+  </div>
+
+  <div class="stats">
+    <div><div class="stat-num">120+</div><div class="stat-label">PROJECTS SHIPPED</div></div>
+    <div><div class="stat-num">98%</div><div class="stat-label">CLIENT RETENTION</div></div>
+    <div><div class="stat-num">24/7</div><div class="stat-label">PROJECT SUPPORT</div></div>
+    <div><div class="stat-num">8+</div><div class="stat-label">YEARS BUILDING</div></div>
+  </div>
+</section>
+
+<section id="services" class="services-wrap">
+  <div class="section-head reveal">
+    <span class="section-tag">What we build</span>
+    <h2>Four ways we plug into your roadmap.</h2>
+    <p>From a single feature to a full product line — pick an entry point and we trace a path through it.</p>
+  </div>
+
+  <div class="services-grid">
+    <div class="service-card reveal">
+      <div class="service-index">/ 01</div>
+      <div class="service-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FF6B4A" stroke-width="2"><path d="M4 17l6-6-6-6M12 19h8"/></svg>
+      </div>
+      <div>
+        <h3>Web Development</h3>
+        <p>Fast, accessible web apps and marketing sites built on modern frameworks, tuned for real-world traffic.</p>
+        <div class="tags"><span>React</span><span>Next.js</span><span>Node</span></div>
+      </div>
+    </div>
+
+    <div class="service-card reveal">
+      <div class="service-index">/ 02</div>
+      <div class="service-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FF6B4A" stroke-width="2"><rect x="6" y="2" width="12" height="20" rx="2"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+      </div>
+      <div>
+        <h3>App Development</h3>
+        <p>Native and cross-platform mobile apps with smooth interactions and offline-first architecture.</p>
+        <div class="tags"><span>iOS</span><span>Android</span><span>Flutter</span></div>
+      </div>
+    </div>
+
+    <div class="service-card reveal">
+      <div class="service-index">/ 03</div>
+      <div class="service-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FF6B4A" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+      </div>
+      <div>
+        <h3>Project Support</h3>
+        <p>Embedded engineers who join your existing codebase and team, on retainer or sprint-by-sprint.</p>
+        <div class="tags"><span>Code review</span><span>DevOps</span><span>QA</span></div>
+      </div>
+    </div>
+
+    <div class="service-card reveal">
+      <div class="service-index">/ 04</div>
+      <div class="service-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FF6B4A" stroke-width="2"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg>
+      </div>
+      <div>
+        <h3>Product Development</h3>
+        <p>Zero-to-one builds: strategy, design, and engineering combined into one shippable product.</p>
+        <div class="tags"><span>MVP</span><span>Strategy</span><span>Scale</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="process">
+  <div class="section-head reveal">
+    <span class="section-tag">How we work</span>
+    <h2>A straight line from idea to release.</h2>
+  </div>
+  <div class="process-list">
+    <div class="process-row reveal">
+      <div class="process-num">01</div>
+      <h3>Scope &amp; architecture</h3>
+      <p>We map the problem, define the technical approach, and agree on milestones before a line of code is written.</p>
+    </div>
+    <div class="process-row reveal">
+      <div class="process-num">02</div>
+      <h3>Build in sprints</h3>
+      <p>Weekly demos, shared repos, and direct access to the engineers actually writing your software.</p>
+    </div>
+    <div class="process-row reveal">
+      <div class="process-num">03</div>
+      <h3>Test &amp; harden</h3>
+      <p>Automated tests, load checks, and a security pass before anything reaches production.</p>
+    </div>
+    <div class="process-row reveal">
+      <div class="process-num">04</div>
+      <h3>Ship &amp; support</h3>
+      <p>We deploy, monitor, and stay on for ongoing support — no handoff cliff, no disappearing vendor.</p>
+    </div>
+  </div>
+</section>
+
+<section id="why">
+  <div class="why-grid">
+    <div class="why-list">
+      <div class="section-tag" style="margin-bottom:10px;">Why teams choose us</div>
+      <h2 style="font-size:clamp(28px,3.4vw,38px); font-weight:800; letter-spacing:-1px; margin-bottom:26px;">Built like an in-house team, priced like a studio.</h2>
+
+      <div class="why-item reveal">
+        <div class="num">A</div>
+        <div><h4>Senior engineers only</h4><p>No junior bench time billed to you — every project is staffed by people who've shipped at scale before.</p></div>
+      </div>
+      <div class="why-item reveal">
+        <div class="num">B</div>
+        <div><h4>Fixed-scope clarity</h4><p>You know the cost and timeline before we start. Changes are scoped, not silently absorbed.</p></div>
+      </div>
+      <div class="why-item reveal">
+        <div class="num">C</div>
+        <div><h4>You own the code</h4><p>Full repo access from day one. Nothing is licensed back to you or held hostage.</p></div>
+      </div>
+    </div>
+
+    <div class="why-visual reveal">
+      <svg width="80%" height="80%" viewBox="0 0 300 300">
+        <circle cx="150" cy="150" r="90" fill="none" stroke="#262C49" stroke-width="1"/>
+        <circle cx="150" cy="150" r="120" fill="none" stroke="#262C49" stroke-width="1"/>
+        <circle cx="150" cy="150" r="60" fill="none" stroke="#FF6B4A" stroke-width="1.5" stroke-dasharray="4 6">
+          <animateTransform attributeName="transform" type="rotate" from="0 150 150" to="360 150 150" dur="22s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="150" cy="150" r="90" fill="none" stroke="#5EEAD4" stroke-width="1.5" stroke-dasharray="2 8">
+          <animateTransform attributeName="transform" type="rotate" from="360 150 150" to="0 150 150" dur="30s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="150" cy="60" r="5" fill="#FF6B4A"/>
+        <circle cx="240" cy="150" r="4" fill="#5EEAD4"/>
+        <circle cx="150" cy="240" r="4" fill="#FFC857"/>
+        <circle cx="60" cy="150" r="4" fill="#FF6B4A"/>
+        <text x="150" y="156" text-anchor="middle" fill="#F4F2EC" font-family="JetBrains Mono" font-size="13">SaRa Sols</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="cta-section reveal">
+    <div class="cta-glow"></div>
+    <h2>Have a build in mind? Let's trace the path.</h2>
+    <p>Tell us what you're building — we'll reply within one business day with next steps.</p>
+    <a href="mailto:hello@sarasols.com" class="btn-primary">hello@sarasols.com</a>
+  </div>
+</section>
+
+<footer>
+  <div>© 2026 SaRa Sols. All rights reserved.</div>
+  <div class="f-links">
+    <a href="#services">Services</a>
+    <a href="#process">Process</a>
+    <a href="#contact">Contact</a>
+  </div>
+</footer>
+
+<script>
+  // scroll reveal
+  const revealEls = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        e.target.classList.add('in');
+        io.unobserve(e.target);
+      }
+    });
+  },{threshold:0.15});
+  revealEls.forEach(el=>io.observe(el));
+
+  // animated trace line dash
+  const trace = document.getElementById('traceAnim');
+  if(trace){
+    const len = trace.getTotalLength();
+    trace.style.strokeDasharray = len;
+    trace.style.strokeDashoffset = len;
+    trace.animate(
+      [{strokeDashoffset:len},{strokeDashoffset:0}],
+      {duration:3200, easing:'ease-in-out', fill:'forwards', delay:300}
+    );
+  }
+</script>
+
+</body>
+</html>
